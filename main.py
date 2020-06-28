@@ -1,3 +1,4 @@
+from wsgiref import simple_server
 from flask import Flask, request, render_template
 from flask import Response
 import os
@@ -14,6 +15,7 @@ os.putenv('LC_ALL', 'en_US.UTF-8')
 app = Flask(__name__)
 dashboard.bind(app)
 CORS(app)
+
 
 @app.route("/", methods=['GET'])
 @cross_origin()
@@ -41,7 +43,7 @@ def predictRouteClient():
 
             pred_val = pred_validation(path) #object initialization
 
-            pred_val.prediction_validation() #calling the prediction_validation function
+            #pred_val.prediction_validation() #calling the prediction_validation function
 
             pred = prediction(path) #object initialization
 
@@ -87,6 +89,9 @@ def trainRouteClient():
         return Response("Error Occurred! %s" % e)
     return Response("Training successfull!!")
 
-
+port = int(os.getenv("PORT",5000))
 if __name__ == "__main__":
-    app.run(debug=True)
+    host='0.0.0.0'
+    httpd = simple_server.make_server( host,port, app)
+    print("Serving on %s %d" % ( host,port))
+    httpd.serve_forever()
